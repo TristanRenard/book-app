@@ -116,7 +116,6 @@ export const clearPendingMutations = async (): Promise<void> => {
   }
 }
 
-// NOTES FUNCTIONS
 export const saveNotes = async (bookId: number, notes: { id: number; bookId: number; content: string; dateISO: string }[]): Promise<void> => {
   try {
     const key = `${STORAGE_KEYS.NOTES}_${bookId}`

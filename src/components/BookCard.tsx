@@ -7,7 +7,7 @@ const BookCard = ({ book }: { book: Book }) => {
   const router = useRouter()
 
   const handlePress = () => {
-    router.push(`/books/book/${book.id}`)
+    router.push(`/(books)/book/${book.id}`)
   }
 
   return (

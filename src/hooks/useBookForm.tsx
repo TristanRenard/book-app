@@ -33,7 +33,6 @@ const useBookForm = (initialData?: Partial<BookFormData>) => {
   const updateFormData = useCallback((data: Partial<BookFormData>) => {
     setFormData((prev) => ({ ...prev, ...data }))
 
-    // Effacer les erreurs des champs modifiés
     setErrors((prevErrors) => {
       const updatedErrors = { ...prevErrors }
       Object.keys(data).forEach((key) => {

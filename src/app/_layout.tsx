@@ -14,19 +14,19 @@ const AppContent = () => {
         headerShown: false,
       }}>
       <Tabs.Screen
-        name="index"
-        options={{
-          headerShown: false,
-          title: 'Home',
-          tabBarIcon: ({ color }) => <Entypo name="home" size={24} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="books"
+        name="(books)"
         options={{
           title: 'books',
           headerShown: false,
           tabBarIcon: ({ color }) => <FontAwesome6 name="book" size={24} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="stats"
+        options={{
+          headerShown: false,
+          title: 'statistics',
+          tabBarIcon: ({ color }) => <Entypo name="gauge" size={24} color={color} />,
         }}
       />
     </Tabs>

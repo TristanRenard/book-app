@@ -30,17 +30,12 @@ const RatingPicker = ({
   const calculateRating = (pageX: number): number => {
     if (!containerLayout) return 0
 
-    // pageX est la position absolue sur l'écran
-    // On soustrait containerLayout.x pour avoir la position relative au conteneur
     const relativeX = pageX - containerLayout.x
 
-    // On s'assure que relativeX est entre 0 et width
     const clampedX = Math.max(0, Math.min(containerLayout.width, relativeX))
 
-    // On calcule le ratio (0 à 1)
     const ratio = clampedX / containerLayout.width
 
-    // On convertit en note de 0 à 5, arrondie au 0.5 près
     const rating = ratio * 5
     return Math.round(rating * 2) / 2
   }
@@ -66,7 +61,6 @@ const RatingPicker = ({
 
     const finalRating = calculateRating(event.nativeEvent.pageX)
 
-    // Si c'est un tap rapide sur la même note, on réinitialise
     if (initialRating === finalRating && finalRating === value) {
       onChange(0)
     } else {

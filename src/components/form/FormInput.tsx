@@ -14,6 +14,7 @@ const FormInput = ({
   onChangeText,
   required = false,
   error,
+  multiline,
   ...textInputProps
 }: FormInputProps) => {
   return (
@@ -22,10 +23,15 @@ const FormInput = ({
         {label} {required && <Text style={styles.required}>*</Text>}
       </Text>
       <TextInput
-        style={[styles.input, error && styles.inputError]}
+        style={[
+          styles.input,
+          error && styles.inputError,
+          multiline && styles.inputMultiline,
+        ]}
         value={value}
         onChangeText={onChangeText}
         placeholderTextColor="#999"
+        multiline={multiline}
         {...textInputProps}
       />
       {error && <Text style={styles.errorText}>{error}</Text>}
@@ -54,6 +60,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#000",
     backgroundColor: "#fff",
+  },
+  inputMultiline: {
+    minHeight: 100,
+    textAlignVertical: "top",
   },
   inputError: {
     borderColor: "#FF5252",

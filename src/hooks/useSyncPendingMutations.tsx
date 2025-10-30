@@ -29,9 +29,7 @@ export const useSyncPendingMutations = () => {
       for (const mutation of mutations) {
         try {
           if (mutation.type === "create" && mutation.book) {
-            // Créer le livre sur le serveur
             const response = await api.post<Book>("/books", mutation.book)
-            // Mettre à jour l'ID local avec l'ID serveur
             await removePendingMutation(mutation.id)
             console.log(`Mutation create ${mutation.id} synchronisée avec succès`)
           } else if (mutation.type === "update" && mutation.book) {

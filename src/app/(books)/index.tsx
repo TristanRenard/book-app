@@ -14,7 +14,7 @@ const Index = () => {
   const router = useRouter()
 
   const handleAdd = () => {
-    router.push("/books/book")
+    router.push("/(books)/book")
   }
 
   useEffect(() => {

@@ -73,6 +73,63 @@ const updateBook = async (book: Book, isOnline: boolean): Promise<Book> => {
   }
 }
 
+const createBook = async (book: Omit<Book, "id" | "createdAt">, isOnline: boolean): Promise<Book> => {
+  if (isOnline) {
+    try {
+      const response = await api.post<Book>("/books", book)
+      await offlineStorage.saveBook(response.data)
+      return response.data
+    } catch (error) {
+      console.error("Erreur lors de la création en ligne, sauvegarde hors ligne")
+      const tempBook: Book = {
+        ...book,
+        id: Date.now(),
+      }
+      await offlineStorage.addPendingMutation({
+        type: "create",
+        book: tempBook,
+      })
+      await offlineStorage.saveBook(tempBook)
+      return tempBook
+    }
+  } else {
+    console.log("Mode hors ligne : sauvegarde du nouveau livre")
+    const tempBook: Book = {
+      ...book,
+      id: Date.now(),
+    }
+    await offlineStorage.addPendingMutation({
+      type: "create",
+      book: tempBook,
+    })
+    await offlineStorage.saveBook(tempBook)
+    return tempBook
+  }
+}
+
+const deleteBook = async (id: number, isOnline: boolean): Promise<void> => {
+  if (isOnline) {
+    try {
+      await api.delete(`/books/${id}`)
+      await offlineStorage.deleteBook(id)
+    } catch (error) {
+      console.error("Erreur lors de la suppression en ligne, sauvegarde hors ligne")
+      await offlineStorage.addPendingMutation({
+        type: "delete",
+        bookId: id,
+      })
+      await offlineStorage.deleteBook(id)
+    }
+  } else {
+    console.log("Mode hors ligne : sauvegarde de la suppression")
+    await offlineStorage.addPendingMutation({
+      type: "delete",
+      bookId: id,
+    })
+    await offlineStorage.deleteBook(id)
+  }
+}
+
 const updateBookCover = async (book: Book): Promise<Book | null> => {
   if (book.cover) return null
 
@@ -117,6 +174,32 @@ export const useUpdateBook = () => {
     mutationFn: (book: Book) => updateBook(book, isOnline),
     onSuccess: (data: Book) => {
       queryClient.setQueryData(bookKeys.detail(data.id), data)
+      queryClient.invalidateQueries({ queryKey: bookKeys.lists() })
+    },
+  })
+}
+
+export const useCreateBook = () => {
+  const queryClient = useQueryClient()
+  const { isOnline } = useNetworkStatus()
+
+  return useMutation({
+    mutationFn: (book: Omit<Book, "id" | "createdAt">) => createBook(book, isOnline),
+    onSuccess: (data: Book) => {
+      queryClient.setQueryData(bookKeys.detail(data.id), data)
+      queryClient.invalidateQueries({ queryKey: bookKeys.lists() })
+    },
+  })
+}
+
+export const useDeleteBook = () => {
+  const queryClient = useQueryClient()
+  const { isOnline } = useNetworkStatus()
+
+  return useMutation({
+    mutationFn: (id: number) => deleteBook(id, isOnline),
+    onSuccess: (_, id: number) => {
+      queryClient.removeQueries({ queryKey: bookKeys.detail(id) })
       queryClient.invalidateQueries({ queryKey: bookKeys.lists() })
     },
   })

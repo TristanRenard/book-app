@@ -4,7 +4,7 @@ import { Image } from "expo-image"
 import * as ImageManipulator from "expo-image-manipulator"
 import * as ImagePicker from "expo-image-picker"
 import { useState } from "react"
-import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from "react-native"
+import { ActivityIndicator, Alert, Platform, Pressable, StyleSheet, Text, View } from "react-native"
 
 interface ImagePickerComponentProps {
   currentImageUrl?: string
@@ -29,11 +29,15 @@ const ImagePickerComponent = ({
   const [previewUri, setPreviewUri] = useState<string | undefined>(currentImageUrl)
 
   const cropImageToRatio = async (uri: string): Promise<string> => {
+    if (Platform.OS === "web") {
+      return uri
+    }
+
     try {
       const imageInfo = await ImageManipulator.manipulateAsync(uri, [], { format: ImageManipulator.SaveFormat.JPEG })
 
       const { width, height } = imageInfo
-      const targetRatio = 5 / 12
+      const targetRatio = 5 / 8
       const currentRatio = width / height
 
       let cropWidth: number
@@ -73,7 +77,44 @@ const ImagePickerComponent = ({
     }
   }
 
+  const pickImageWeb = async () => {
+    return new Promise<string | null>((resolve) => {
+      const input = document.createElement("input")
+      input.type = "file"
+      input.accept = "image/*"
+
+      input.onchange = async (e: Event) => {
+        const target = e.target as HTMLInputElement
+        const file = target.files?.[0]
+
+        if (file) {
+          const reader = new FileReader()
+          reader.onloadend = () => {
+            resolve(reader.result as string)
+          }
+          reader.onerror = () => {
+            resolve(null)
+          }
+          reader.readAsDataURL(file)
+        } else {
+          resolve(null)
+        }
+      }
+
+      input.click()
+    })
+  }
+
   const pickImage = async () => {
+    if (Platform.OS === "web") {
+      const dataUrl = await pickImageWeb()
+      if (dataUrl) {
+        setPreviewUri(dataUrl)
+        await uploadImage(dataUrl)
+      }
+      return
+    }
+
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
 
     if (status !== "granted") {
@@ -97,6 +138,14 @@ const ImagePickerComponent = ({
   }
 
   const takePhoto = async () => {
+    if (Platform.OS === "web") {
+      Alert.alert(
+        "Non disponible",
+        "La capture photo n'est pas disponible sur le web. Utilisez 'Choisir depuis la galerie'."
+      )
+      return
+    }
+
     const { status } = await ImagePicker.requestCameraPermissionsAsync()
 
     if (status !== "granted") {
@@ -109,7 +158,7 @@ const ImagePickerComponent = ({
 
     const result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
-      aspect: [5, 12],
+      aspect: [5, 8],
       quality: 0.8,
     })
 
@@ -120,6 +169,20 @@ const ImagePickerComponent = ({
     }
   }
 
+  const dataURLtoBlob = (dataUrl: string): Blob => {
+    const arr = dataUrl.split(",")
+    const mime = arr[0].match(/:(.*?);/)?.[1] || "image/jpeg"
+    const bstr = atob(arr[1])
+    let n = bstr.length
+    const u8arr = new Uint8Array(n)
+
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n)
+    }
+
+    return new Blob([u8arr], { type: mime })
+  }
+
   const uploadImage = async (uri: string) => {
     setIsUploading(true)
     onUploadStart?.()
@@ -127,17 +190,23 @@ const ImagePickerComponent = ({
     try {
       const formData = new FormData()
 
-      const filename = uri.split("/").pop() || "image.jpg"
-      const match = /\.(\w+)$/.exec(filename)
-      const type = match ? `image/${match[1]}` : "image/jpeg"
+      if (Platform.OS === "web") {
+        const blob = dataURLtoBlob(uri)
+        const filename = `image-${Date.now()}.jpg`
+        formData.append("image", blob, filename)
+      } else {
+        const filename = uri.split("/").pop() || "image.jpg"
+        const match = /\.(\w+)$/.exec(filename)
+        const type = match ? `image/${match[1]}` : "image/jpeg"
 
-      formData.append("image", {
-        uri,
-        name: filename,
-        type,
-      } as any)
+        formData.append("image", {
+          uri,
+          name: filename,
+          type,
+        } as any)
+      }
 
-      console.log("📤 Upload de l'image:", { filename, type })
+      console.log("📤 Upload de l'image")
 
       const response = await api.post<UploadResponse>("/upload", formData, {
         headers: {
@@ -173,6 +242,11 @@ const ImagePickerComponent = ({
   }
 
   const showImageOptions = () => {
+    if (Platform.OS === "web") {
+      pickImage()
+      return
+    }
+
     Alert.alert(
       "Choisir une image",
       "Sélectionnez une source",
@@ -229,7 +303,11 @@ const ImagePickerComponent = ({
             <>
               <Feather name="image" size={48} color="#ccc" />
               <Text style={styles.placeholderText}>Ajouter une couverture</Text>
-              <Text style={styles.placeholderHint}>Touchez pour choisir une image</Text>
+              <Text style={styles.placeholderHint}>
+                {Platform.OS === "web"
+                  ? "Cliquez pour choisir une image"
+                  : "Touchez pour choisir une image"}
+              </Text>
             </>
           )}
         </View>
@@ -241,7 +319,8 @@ const ImagePickerComponent = ({
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    aspectRatio: 5 / 12,
+    aspectRatio: 5 / 8,
+    maxHeight: 400,
     backgroundColor: "#f5f5f5",
     borderRadius: 8,
     overflow: "hidden",

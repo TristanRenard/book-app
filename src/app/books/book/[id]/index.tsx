@@ -1,6 +1,7 @@
 import ActionButton from "@/src/components/ActionButton"
 import HeaderButton from "@/src/components/HeaderButton"
 import InfoRow from "@/src/components/InfoRow"
+import NetworkStatusBanner from "@/src/components/NetworkStatusBanner"
 import StarRating from "@/src/components/StarRating"
 import { useBook, useToggleFavorite, useToggleRead } from "@/src/hooks/useBooks"
 import { useNetworkStatus } from "@/src/hooks/useNetworkStatus"
@@ -38,7 +39,7 @@ const Book = () => {
 
   const handleEdit = () => {
     if (!book) return
-    router.push(`/book/${book.id}/edit`)
+    router.push(`/books/book/${book.id}/edit`)
   }
 
   if (isLoading) {
@@ -62,6 +63,7 @@ const Book = () => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+      <NetworkStatusBanner />
       <ScrollView style={styles.container}>
         <View style={styles.header}>
           <HeaderButton icon="arrow-left" onPress={() => router.back()} />

@@ -209,21 +209,21 @@ export const useToggleFavorite = () => {
   const queryClient = useQueryClient()
   const { isOnline } = useNetworkStatus()
 
-  return useMutation({
+  return useMutation<Book, Error, Book, { previousBook: Book | undefined }>({
     mutationFn: async (book: Book) => {
       const updatedBook: Book = { ...book, favorite: !book.favorite }
       return updateBook(updatedBook, isOnline)
     },
     onMutate: async (book: Book) => {
       await queryClient.cancelQueries({ queryKey: bookKeys.detail(book.id) })
-      const previousBook = queryClient.getQueryData(bookKeys.detail(book.id))
+      const previousBook = queryClient.getQueryData<Book>(bookKeys.detail(book.id))
 
       const updatedBook = { ...book, favorite: !book.favorite }
       queryClient.setQueryData(bookKeys.detail(book.id), updatedBook)
 
       return { previousBook }
     },
-    onError: (_: null, book: Book, context: { previousBook: Book | null }) => {
+    onError: (_error, book, context) => {
       if (context?.previousBook) {
         queryClient.setQueryData(bookKeys.detail(book.id), context.previousBook)
       }
@@ -238,21 +238,21 @@ export const useToggleRead = () => {
   const queryClient = useQueryClient()
   const { isOnline } = useNetworkStatus()
 
-  return useMutation({
+  return useMutation<Book, Error, Book, { previousBook: Book | undefined }>({
     mutationFn: async (book: Book) => {
       const updatedBook: Book = { ...book, read: !book.read }
       return updateBook(updatedBook, isOnline)
     },
     onMutate: async (book: Book) => {
       await queryClient.cancelQueries({ queryKey: bookKeys.detail(book.id) })
-      const previousBook = queryClient.getQueryData(bookKeys.detail(book.id))
+      const previousBook = queryClient.getQueryData<Book>(bookKeys.detail(book.id))
 
       const updatedBook = { ...book, read: !book.read }
       queryClient.setQueryData(bookKeys.detail(book.id), updatedBook)
 
       return { previousBook }
     },
-    onError: (_: null, book: Book, context: { previousBook: Book | null }) => {
+    onError: (_error, book, context) => {
       if (context?.previousBook) {
         queryClient.setQueryData(bookKeys.detail(book.id), context.previousBook)
       }

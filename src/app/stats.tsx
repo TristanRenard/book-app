@@ -1,4 +1,5 @@
 import NetworkStatusBanner from "@/src/components/NetworkStatusBanner"
+import StarRating from "@/src/components/StarRating"
 import AreaChart from "@/src/components/stats/AreaChart"
 import CircularProgress from "@/src/components/stats/CircularProgress"
 import ModernBarChart from "@/src/components/stats/ModernBarChart"
@@ -95,6 +96,13 @@ const Stats = () => {
             <MultiLevelSunburst books={books} onThemePress={setSelectedTheme} />
           </View>
           <SunburstLegend />
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Note moyenne</Text>
+          <View style={styles.chartContainer}>
+            <StarRating rating={stats.averageRating} />
+          </View>
         </View>
 
         <View style={styles.section}>

@@ -1,4 +1,4 @@
-export const getThemeColor = (themeName: string, baseHue: number = 210): string => {
+export const getThemeColor = (themeName: string, baseHue: number = 50): string => {
   let hash = 0
   for (let i = 0; i < themeName.length; i++) {
     hash = themeName.charCodeAt(i) + ((hash << 5) - hash)
@@ -29,7 +29,7 @@ export const hslToHex = (h: number, s: number, l: number): string => {
   return `#${f(0)}${f(8)}${f(4)}`
 }
 
-export const generateThemeColors = (themes: string[], baseHue: number = 210): Record<string, string> => {
+export const generateThemeColors = (themes: string[], baseHue: number = 60): Record<string, string> => {
   return themes.reduce((acc, theme) => {
     acc[theme] = getThemeColor(theme, baseHue)
     return acc

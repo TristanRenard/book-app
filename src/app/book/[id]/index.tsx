@@ -3,6 +3,8 @@ import HeaderButton from "@/src/components/HeaderButton"
 import InfoRow from "@/src/components/InfoRow"
 import StarRating from "@/src/components/StarRating"
 import { useBook, useToggleFavorite, useToggleRead } from "@/src/hooks/useBooks"
+import { useNetworkStatus } from "@/src/hooks/useNetworkStatus"
+import api from "@/src/utils/api"
 import { Image } from "expo-image"
 import { useLocalSearchParams, useRouter } from "expo-router"
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native"
@@ -11,10 +13,18 @@ import { SafeAreaView } from "react-native-safe-area-context"
 const Book = () => {
   const { id } = useLocalSearchParams<{ id: string }>()
   const router = useRouter()
+  const { isOnline } = useNetworkStatus()
+
 
   const { data: book, isLoading, error } = useBook(Number(id))
   const { mutate: toggleFavorite, isPending: isFavoriteLoading } = useToggleFavorite()
   const { mutate: toggleRead, isPending: isReadLoading } = useToggleRead()
+
+  const handleDelete = () => {
+    api.delete(`/books/${id}`).then(() => {
+      router.replace("/")
+    })
+  }
 
   const handleFavorite = () => {
     if (!book) return
@@ -85,6 +95,14 @@ const Book = () => {
               label={book.favorite ? "Favori" : "Ajouter aux favoris"}
               isActive={book.favorite}
               onPress={handleFavorite}
+              activeColor="#FF5252"
+              inactiveColor="#FF5252"
+            />
+            <ActionButton
+              icon="x"
+              label={isOnline ? "Supprimer" : "indisponible hors ligne"}
+              isActive={isOnline}
+              onPress={handleDelete}
               activeColor="#FF5252"
               inactiveColor="#FF5252"
             />

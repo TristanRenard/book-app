@@ -1,3 +1,4 @@
+import { useTheme } from "@/src/contexts/ThemeContext"
 import { StyleSheet, Text, TextInput, TextInputProps, View } from "react-native"
 
 interface FormInputProps extends TextInputProps {
@@ -17,6 +18,9 @@ const FormInput = ({
   multiline,
   ...textInputProps
 }: FormInputProps) => {
+  const { colors } = useTheme()
+  const styles = createStyles(colors)
+
   return (
     <View style={styles.inputGroup}>
       <Text style={styles.label}>
@@ -30,7 +34,7 @@ const FormInput = ({
         ]}
         value={value}
         onChangeText={onChangeText}
-        placeholderTextColor="#999"
+        placeholderTextColor={colors.textTertiary}
         multiline={multiline}
         {...textInputProps}
       />
@@ -39,40 +43,41 @@ const FormInput = ({
   )
 }
 
-const styles = StyleSheet.create({
-  inputGroup: {
-    gap: 8,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#000",
-  },
-  required: {
-    color: "#FF5252",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: "#000",
-    backgroundColor: "#fff",
-  },
-  inputMultiline: {
-    minHeight: 100,
-    textAlignVertical: "top",
-  },
-  inputError: {
-    borderColor: "#FF5252",
-  },
-  errorText: {
-    fontSize: 14,
-    color: "#FF5252",
-    marginTop: 4,
-  },
-})
+const createStyles = (colors: any) =>
+  StyleSheet.create({
+    inputGroup: {
+      gap: 8,
+    },
+    label: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: colors.text,
+    },
+    required: {
+      color: colors.error,
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 8,
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      fontSize: 16,
+      color: colors.text,
+      backgroundColor: colors.surface,
+    },
+    inputMultiline: {
+      minHeight: 100,
+      textAlignVertical: "top",
+    },
+    inputError: {
+      borderColor: colors.error,
+    },
+    errorText: {
+      fontSize: 14,
+      color: colors.error,
+      marginTop: 4,
+    },
+  })
 
 export default FormInput

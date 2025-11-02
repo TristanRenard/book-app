@@ -1,6 +1,7 @@
 import FormInput from "@/src/components/form/FormInput"
 import ImagePickerComponent from "@/src/components/form/ImagePicker"
 import RatingPicker from "@/src/components/form/RatingPicker"
+import { useTheme } from "@/src/contexts/ThemeContext"
 import { ScrollView, StyleSheet, Text, View } from "react-native"
 
 interface BookFormData {
@@ -20,6 +21,9 @@ interface BookFormProps {
 }
 
 const BookForm = ({ formData, onFormChange, errors = {} }: BookFormProps) => {
+  const { colors } = useTheme()
+  const styles = createStyles(colors)
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.imageSection}>
@@ -87,26 +91,28 @@ const BookForm = ({ formData, onFormChange, errors = {} }: BookFormProps) => {
   )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  imageSection: {
-    padding: 20,
-  },
-  form: {
-    padding: 20,
-    paddingTop: 0,
-    gap: 20,
-  },
-  inputGroup: {
-    gap: 8,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#000",
-  },
-})
+const createStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    imageSection: {
+      padding: 20,
+    },
+    form: {
+      padding: 20,
+      paddingTop: 0,
+      gap: 20,
+    },
+    inputGroup: {
+      gap: 8,
+    },
+    label: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: colors.text,
+    },
+  })
 
 export default BookForm

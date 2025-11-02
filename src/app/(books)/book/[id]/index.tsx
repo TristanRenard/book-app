@@ -4,7 +4,9 @@ import HeaderButton from "@/src/components/HeaderButton"
 import InfoRow from "@/src/components/InfoRow"
 import NetworkStatusBanner from "@/src/components/NetworkStatusBanner"
 import StarRating from "@/src/components/StarRating"
+import { useTheme } from "@/src/contexts/ThemeContext"
 import { useBook, useToggleFavorite, useToggleRead } from "@/src/hooks/useBooks"
+import { useEditionCount } from "@/src/hooks/useEditionCount"
 import { useNetworkStatus } from "@/src/hooks/useNetworkStatus"
 import { useCreateNote, useNotes } from "@/src/hooks/useNotes"
 import api from "@/src/utils/api"
@@ -25,6 +27,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context"
 
 const Book = () => {
+  const { colors } = useTheme()
   const { id } = useLocalSearchParams<{ id: string }>()
   const router = useRouter()
   const { isOnline } = useNetworkStatus()
@@ -35,6 +38,7 @@ const Book = () => {
   const { mutate: toggleFavorite } = useToggleFavorite()
   const { mutate: toggleRead } = useToggleRead()
   const { mutate: createNote, isPending: isCreatingNote } = useCreateNote()
+  const { data: editionCount, isLoading: isLoadingEditions } = useEditionCount(book)
 
   const handleDelete = () => {
     Alert.alert("Supprimer le livre", "Êtes-vous sûr de vouloir supprimer ce livre ?", [
@@ -83,10 +87,12 @@ const Book = () => {
     )
   }
 
+  const styles = createStyles(colors)
+
   if (isLoading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#007AFF" />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     )
   }
@@ -137,24 +143,24 @@ const Book = () => {
                 label={book.read ? "Lu" : "Marquer comme lu"}
                 isActive={book.read}
                 onPress={handleRead}
-                activeColor="#4CAF50"
-                inactiveColor="#4CAF50"
+                activeColor={colors.read}
+                inactiveColor={colors.read}
               />
               <ActionButton
                 icon="heart"
                 label={book.favorite ? "Favori" : "Ajouter aux favoris"}
                 isActive={book.favorite}
                 onPress={handleFavorite}
-                activeColor="#FF5252"
-                inactiveColor="#FF5252"
+                activeColor={colors.favorite}
+                inactiveColor={colors.favorite}
               />
               <ActionButton
                 icon="x"
                 label={isOnline ? "Supprimer" : "indisponible hors ligne"}
                 isActive={isOnline}
                 onPress={handleDelete}
-                activeColor="#FF5252"
-                inactiveColor="#FF5252"
+                activeColor={colors.error}
+                inactiveColor={colors.error}
               />
             </View>
 
@@ -170,6 +176,17 @@ const Book = () => {
               <InfoRow icon="book-open" label="Éditeur" value={book.editor} />
               <InfoRow icon="calendar" label="Année" value={book.year.toString()} />
               {book.theme && <InfoRow icon="tag" label="Thème" value={book.theme} />}
+              <InfoRow
+                icon="layers"
+                label="Éditions"
+                value={
+                  isLoadingEditions
+                    ? "Chargement..."
+                    : editionCount !== undefined && editionCount > 0
+                      ? `${editionCount} édition${editionCount > 1 ? "s" : ""}`
+                      : "Non disponible"
+                }
+              />
             </View>
           </View>
 
@@ -189,14 +206,14 @@ const Book = () => {
                 disabled={isCreatingNote || !newNote.trim()}
               >
                 {isCreatingNote ? (
-                  <ActivityIndicator size="small" color="#fff" />
+                  <ActivityIndicator size="small" color={colors.surface} />
                 ) : (
                   <Text style={styles.noteButtonText}>Ajouter la note</Text>
                 )}
               </Pressable>
             </View>
             {notesLoading ? (
-              <ActivityIndicator size="small" color="#007AFF" />
+              <ActivityIndicator size="small" color={colors.primary} />
             ) : notes && notes.length > 0 ? (
               <View style={styles.notesList}>
                 {notes.map((note) => (
@@ -222,143 +239,144 @@ const Book = () => {
   )
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-  },
-  centerContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    padding: 16,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  headerActions: {
-    flexDirection: "row",
-    gap: 12,
-  },
-  cover: {
-    width: "100%",
-    height: 400,
-    marginBottom: 16,
-  },
-  content: {
-    padding: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginBottom: 20,
-    color: "#000",
-  },
-  actionButtons: {
-    gap: 12,
-    marginBottom: 24,
-  },
-  ratingContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 24,
-    paddingBottom: 24,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
-    gap: 12,
-  },
-  ratingText: {
-    fontSize: 18,
-    color: "#000",
-    fontWeight: "600",
-  },
-  infoSection: {
-    gap: 16,
-  },
-  errorText: {
-    fontSize: 18,
-    color: "#666",
-    marginBottom: 20,
-  },
-  backButtonError: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    backgroundColor: "#007AFF",
-  },
-  backButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  notesContainer: {
-    padding: 20,
-    paddingTop: 0,
-    borderTopWidth: 1,
-    borderTopColor: "#e0e0e0",
-  },
-  notesTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#000",
-    marginBottom: 16,
-  },
-  notesList: {
-    gap: 12,
-    marginBottom: 24,
-  },
-  noteItem: {
-    padding: 16,
-    backgroundColor: "#f5f5f5",
-    borderRadius: 8,
-    gap: 8,
-  },
-  noteContent: {
-    fontSize: 16,
-    color: "#000",
-    lineHeight: 22,
-  },
-  noteDate: {
-    fontSize: 12,
-    color: "#666",
-  },
-  noNotes: {
-    fontSize: 14,
-    color: "#999",
-    fontStyle: "italic",
-    marginBottom: 24,
-    textAlign: "center",
-  },
-  noteForm: {
-    gap: 12,
-    marginBottom: 40,
-  },
-  noteButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    backgroundColor: "#007AFF",
-    alignItems: "center",
-  },
-  noteButtonDisabled: {
-    opacity: 0.6,
-  },
-  noteButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-})
+const createStyles = (colors: any) =>
+  StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    keyboardView: {
+      flex: 1,
+    },
+    container: {
+      flex: 1,
+    },
+    centerContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: colors.background,
+      padding: 16,
+    },
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+    },
+    headerActions: {
+      flexDirection: "row",
+      gap: 12,
+    },
+    cover: {
+      width: "100%",
+      height: 400,
+      marginBottom: 16,
+    },
+    content: {
+      padding: 20,
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: "bold",
+      marginBottom: 20,
+      color: colors.text,
+    },
+    actionButtons: {
+      gap: 12,
+      marginBottom: 24,
+    },
+    ratingContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: 24,
+      paddingBottom: 24,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+      gap: 12,
+    },
+    ratingText: {
+      fontSize: 18,
+      color: colors.text,
+      fontWeight: "600",
+    },
+    infoSection: {
+      gap: 16,
+    },
+    errorText: {
+      fontSize: 18,
+      color: colors.textSecondary,
+      marginBottom: 20,
+    },
+    backButtonError: {
+      paddingVertical: 12,
+      paddingHorizontal: 24,
+      borderRadius: 8,
+      backgroundColor: colors.primary,
+    },
+    backButtonText: {
+      color: colors.surface,
+      fontSize: 16,
+      fontWeight: "600",
+    },
+    notesContainer: {
+      padding: 20,
+      paddingTop: 0,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    notesTitle: {
+      fontSize: 22,
+      fontWeight: "bold",
+      color: colors.text,
+      marginBottom: 16,
+    },
+    notesList: {
+      gap: 12,
+      marginBottom: 24,
+    },
+    noteItem: {
+      padding: 16,
+      backgroundColor: colors.surfaceVariant,
+      borderRadius: 8,
+      gap: 8,
+    },
+    noteContent: {
+      fontSize: 16,
+      color: colors.text,
+      lineHeight: 22,
+    },
+    noteDate: {
+      fontSize: 12,
+      color: colors.textSecondary,
+    },
+    noNotes: {
+      fontSize: 14,
+      color: colors.textTertiary,
+      fontStyle: "italic",
+      marginBottom: 24,
+      textAlign: "center",
+    },
+    noteForm: {
+      gap: 12,
+      marginBottom: 40,
+    },
+    noteButton: {
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      borderRadius: 8,
+      backgroundColor: colors.primary,
+      alignItems: "center",
+    },
+    noteButtonDisabled: {
+      opacity: 0.6,
+    },
+    noteButtonText: {
+      color: colors.surface,
+      fontSize: 16,
+      fontWeight: "600",
+    },
+  })
 
 export default Book

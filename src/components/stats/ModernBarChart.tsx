@@ -1,3 +1,4 @@
+import { useTheme } from "@/src/contexts/ThemeContext"
 import { Dimensions } from "react-native"
 import Svg, { G, Line, Rect, Text as SvgText } from "react-native-svg"
 
@@ -11,9 +12,9 @@ type ModernBarChartProps = {
   colors?: string[]
 }
 
-const DEFAULT_COLORS = ["#007AFF", "#007AFF", "#007AFF", "#007AFF", "#007AFF", "#007AFF"]
-
-const ModernBarChart = ({ data, labels, colors = DEFAULT_COLORS }: ModernBarChartProps) => {
+const ModernBarChart = ({ data, labels, colors: customColors }: ModernBarChartProps) => {
+  const { colors } = useTheme()
+  const barColors = customColors || [colors.primary, colors.primary, colors.primary, colors.primary, colors.primary, colors.primary]
   const maxValue = Math.max(...data, 1)
   const barWidth = (CHART_WIDTH - 80) / data.length - 12
 
@@ -24,8 +25,8 @@ const ModernBarChart = ({ data, labels, colors = DEFAULT_COLORS }: ModernBarChar
           const y = 200 - fraction * 160
           return (
             <G key={i}>
-              <Line x1="50" y1={y} x2={CHART_WIDTH - 20} y2={y} stroke="#f0f0f0" strokeWidth="1" />
-              <SvgText x="35" y={y + 5} fontSize="10" fill="#999" textAnchor="end">
+              <Line x1="50" y1={y} x2={CHART_WIDTH - 20} y2={y} stroke={colors.borderLight} strokeWidth="1" />
+              <SvgText x="35" y={y + 5} fontSize="10" fill={colors.textTertiary} textAnchor="end">
                 {Math.round(maxValue * fraction)}
               </SvgText>
             </G>
@@ -39,13 +40,13 @@ const ModernBarChart = ({ data, labels, colors = DEFAULT_COLORS }: ModernBarChar
 
           return (
             <G key={index}>
-              <Rect x={x} y={y} width={barWidth} height={height} fill={colors[index % colors.length]} rx="6" />
+              <Rect x={x} y={y} width={barWidth} height={height} fill={barColors[index % barColors.length]} rx="6" />
               {value > 0 && (
-                <SvgText x={x + barWidth / 2} y={y - 8} fontSize="14" fontWeight="600" fill="#000" textAnchor="middle">
+                <SvgText x={x + barWidth / 2} y={y - 8} fontSize="14" fontWeight="600" fill={colors.text} textAnchor="middle">
                   {value}
                 </SvgText>
               )}
-              <SvgText x={x + barWidth / 2} y="225" fontSize="14" fill="#666" textAnchor="middle">
+              <SvgText x={x + barWidth / 2} y="225" fontSize="14" fill={colors.textSecondary} textAnchor="middle">
                 {labels[index]}
               </SvgText>
             </G>

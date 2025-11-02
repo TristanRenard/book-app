@@ -7,6 +7,7 @@ import MultiLevelSunburst from "@/src/components/stats/MultiLevelSunburst"
 import SelectedThemeCard from "@/src/components/stats/SelectedThemeCard"
 import StatsOverview from "@/src/components/stats/StatsOverView"
 import SunburstLegend from "@/src/components/stats/SunburstLegend"
+import { useTheme } from "@/src/contexts/ThemeContext"
 import { useBooks } from "@/src/hooks/useBooks"
 import { useStats } from "@/src/hooks/useStats"
 import { Feather } from "@expo/vector-icons"
@@ -23,17 +24,20 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context"
 
 const Stats = () => {
+  const { colors } = useTheme()
   const router = useRouter()
   const { data: stats, isLoading: statsLoading } = useStats()
   const { data: books, isLoading: booksLoading } = useBooks()
   const [selectedTheme, setSelectedTheme] = useState<string | null>(null)
+
+  const styles = createStyles(colors)
 
   if (statsLoading || booksLoading) {
     return (
       <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
         <NetworkStatusBanner />
         <View style={styles.centerContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       </SafeAreaView>
     )
@@ -74,7 +78,7 @@ const Stats = () => {
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Pressable onPress={() => router.back()} style={styles.backButton}>
-            <Feather name="arrow-left" size={24} color="#000" />
+            <Feather name="arrow-left" size={24} color={colors.text} />
           </Pressable>
           <Text style={styles.headerTitle}>Statistiques</Text>
           <View style={styles.placeholder} />
@@ -134,73 +138,75 @@ const Stats = () => {
   )
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  container: {
-    flex: 1,
-  },
-  centerContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  errorText: {
-    fontSize: 16,
-    color: "#666",
-    textAlign: "center",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
-  },
-  backButton: {
-    padding: 8,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#000",
-  },
-  placeholder: {
-    width: 40,
-  },
-  section: {
-    padding: 20,
-    paddingTop: 0,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#000",
-    marginBottom: 20,
-  },
-  sunburstContainer: {
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  progressCircleContainer: {
-    alignItems: "center",
-  },
-  chartContainer: {
-    backgroundColor: "#fff",
-    padding: 16,
-    borderRadius: 16,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-})
+const createStyles = (colors: any) =>
+  StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    container: {
+      flex: 1,
+    },
+    centerContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 20,
+      backgroundColor: colors.background,
+    },
+    errorText: {
+      fontSize: 16,
+      color: colors.textSecondary,
+      textAlign: "center",
+    },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    backButton: {
+      padding: 8,
+    },
+    headerTitle: {
+      fontSize: 20,
+      fontWeight: "bold",
+      color: colors.text,
+    },
+    placeholder: {
+      width: 40,
+    },
+    section: {
+      padding: 20,
+      paddingTop: 0,
+    },
+    sectionTitle: {
+      fontSize: 20,
+      fontWeight: "bold",
+      color: colors.text,
+      marginBottom: 20,
+    },
+    sunburstContainer: {
+      alignItems: "center",
+      marginBottom: 20,
+    },
+    progressCircleContainer: {
+      alignItems: "center",
+    },
+    chartContainer: {
+      backgroundColor: colors.surface,
+      padding: 16,
+      borderRadius: 16,
+      alignItems: "center",
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.05,
+      shadowRadius: 8,
+      elevation: 2,
+    },
+  })
 
 export default Stats

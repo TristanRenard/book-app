@@ -1,3 +1,4 @@
+import { useTheme } from "@/src/contexts/ThemeContext"
 import { getThemeColor } from "@/src/utils/colorUtils"
 import { Dimensions, Platform, Pressable, View } from "react-native"
 import Svg, { Circle, Defs, Path, RadialGradient, Stop, Text as SvgText } from "react-native-svg"
@@ -28,6 +29,7 @@ type Segment = {
 }
 
 const MultiLevelSunburst = ({ books, onThemePress }: MultiLevelSunburstProps) => {
+  const { colors } = useTheme()
   const centerX = SUNBURST_SIZE / 2
   const centerY = SUNBURST_SIZE / 2
 
@@ -42,8 +44,8 @@ const MultiLevelSunburst = ({ books, onThemePress }: MultiLevelSunburstProps) =>
   const unreadBooks = books.filter((b) => !b.read)
 
   const level1Data = [
-    { name: "Lus", count: readBooks.length, color: "#4CAF50", books: readBooks },
-    { name: "Non lus", count: unreadBooks.length, color: "#9E9E9E", books: unreadBooks },
+    { name: "Lus", count: readBooks.length, color: colors.success, books: readBooks },
+    { name: "Non lus", count: unreadBooks.length, color: colors.textSecondary, books: unreadBooks },
   ]
 
   let currentAngle = -Math.PI / 2
@@ -101,8 +103,8 @@ const MultiLevelSunburst = ({ books, onThemePress }: MultiLevelSunburstProps) =>
       let level3CurrentAngle = level2StartAngle
 
       const level3Data = [
-        { books: favoriteBooks, color: "#FF5252" },
-        { books: nonFavoriteBooks, color: "#E0E0E0" },
+        { books: favoriteBooks, color: colors.favorite },
+        { books: nonFavoriteBooks, color: colors.borderLight },
       ]
 
       level3Data.forEach((level3Item) => {
@@ -177,8 +179,8 @@ const MultiLevelSunburst = ({ books, onThemePress }: MultiLevelSunburstProps) =>
         <Svg width={SUNBURST_SIZE} height={SUNBURST_SIZE}>
           <Defs>
             <RadialGradient id="centerGradient" cx="50%" cy="50%">
-              <Stop offset="0%" stopColor="#F5F5F5" stopOpacity="1" />
-              <Stop offset="100%" stopColor="#FFFFFF" stopOpacity="1" />
+              <Stop offset="0%" stopColor={colors.surfaceVariant} stopOpacity="1" />
+              <Stop offset="100%" stopColor={colors.surface} stopOpacity="1" />
             </RadialGradient>
           </Defs>
 
@@ -188,7 +190,7 @@ const MultiLevelSunburst = ({ books, onThemePress }: MultiLevelSunburstProps) =>
             cy={centerY}
             r={level1InnerRadius}
             fill="none"
-            stroke="#E0E0E0"
+            stroke={colors.border}
             strokeWidth="2"
           />
 
@@ -222,7 +224,7 @@ const MultiLevelSunburst = ({ books, onThemePress }: MultiLevelSunburstProps) =>
                 d={pathData}
                 fill={color}
                 opacity={level === 1 ? 1 : level === 2 ? 0.9 : 0.85}
-                stroke="#FFFFFF"
+                stroke={colors.surface}
                 strokeWidth="2"
               />
             )
@@ -233,7 +235,7 @@ const MultiLevelSunburst = ({ books, onThemePress }: MultiLevelSunburstProps) =>
             cy={centerY}
             r={level1OuterRadius}
             fill="none"
-            stroke="#FFFFFF"
+            stroke={colors.surface}
             strokeWidth="3"
           />
           <Circle
@@ -241,7 +243,7 @@ const MultiLevelSunburst = ({ books, onThemePress }: MultiLevelSunburstProps) =>
             cy={centerY}
             r={level2OuterRadius}
             fill="none"
-            stroke="#FFFFFF"
+            stroke={colors.surface}
             strokeWidth="3"
           />
 
@@ -250,12 +252,12 @@ const MultiLevelSunburst = ({ books, onThemePress }: MultiLevelSunburstProps) =>
             y={centerY - 10}
             fontSize="32"
             fontWeight="bold"
-            fill="#007AFF"
+            fill={colors.primaryDark}
             textAnchor="middle"
           >
             {books.length}
           </SvgText>
-          <SvgText x={centerX} y={centerY + 15} fontSize="14" fill="#666" textAnchor="middle">
+          <SvgText x={centerX} y={centerY + 15} fontSize="14" fill={colors.textSecondary} textAnchor="middle">
             Livres
           </SvgText>
         </Svg>

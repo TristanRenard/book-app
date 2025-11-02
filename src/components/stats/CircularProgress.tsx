@@ -1,3 +1,4 @@
+import { useTheme } from "@/src/contexts/ThemeContext"
 import { StyleSheet, Text, View } from "react-native"
 import Svg, { Circle, Defs, LinearGradient, Stop } from "react-native-svg"
 
@@ -8,6 +9,9 @@ type CircularProgressProps = {
 }
 
 const CircularProgress = ({ percentage, readCount, totalBooks }: CircularProgressProps) => {
+  const { colors } = useTheme()
+  const styles = createStyles(colors)
+
   const size = 180
   const strokeWidth = 12
   const center = size / 2
@@ -21,8 +25,8 @@ const CircularProgress = ({ percentage, readCount, totalBooks }: CircularProgres
         <Svg width={size} height={size}>
           <Defs>
             <LinearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <Stop offset="0%" stopColor="#007AFF" stopOpacity="1" />
-              <Stop offset="100%" stopColor="#007AFF" stopOpacity="1" />
+              <Stop offset="0%" stopColor={colors.primary} stopOpacity="1" />
+              <Stop offset="100%" stopColor={colors.primary} stopOpacity="1" />
             </LinearGradient>
           </Defs>
 
@@ -30,7 +34,7 @@ const CircularProgress = ({ percentage, readCount, totalBooks }: CircularProgres
             cx={center}
             cy={center}
             r={radius}
-            stroke="#F5F5F5"
+            stroke={colors.surfaceVariant}
             strokeWidth={strokeWidth}
             fill="transparent"
           />
@@ -61,50 +65,51 @@ const CircularProgress = ({ percentage, readCount, totalBooks }: CircularProgres
   )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 20,
-  },
-  svgWrapper: {
-    position: "relative",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  content: {
-    position: "absolute",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  percentage: {
-    fontSize: 42,
-    fontWeight: "700",
-    color: "#007AFF",
-    letterSpacing: -1,
-  },
-  label: {
-    fontSize: 13,
-    color: "#999",
-    marginTop: 2,
-    fontWeight: "500",
-  },
-  divider: {
-    width: 40,
-    height: 1,
-    backgroundColor: "#E0E0E0",
-    marginVertical: 10,
-  },
-  count: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#333",
-  },
-  subLabel: {
-    fontSize: 12,
-    color: "#999",
-    marginTop: 2,
-  },
-})
+const createStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 20,
+    },
+    svgWrapper: {
+      position: "relative",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    content: {
+      position: "absolute",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    percentage: {
+      fontSize: 42,
+      fontWeight: "700",
+      color: colors.primary,
+      letterSpacing: -1,
+    },
+    label: {
+      fontSize: 13,
+      color: colors.textTertiary,
+      marginTop: 2,
+      fontWeight: "500",
+    },
+    divider: {
+      width: 40,
+      height: 1,
+      backgroundColor: colors.border,
+      marginVertical: 10,
+    },
+    count: {
+      fontSize: 18,
+      fontWeight: "600",
+      color: colors.text,
+    },
+    subLabel: {
+      fontSize: 12,
+      color: colors.textTertiary,
+      marginTop: 2,
+    },
+  })
 
 export default CircularProgress

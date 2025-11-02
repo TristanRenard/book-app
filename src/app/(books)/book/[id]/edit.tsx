@@ -1,6 +1,7 @@
 import HeaderButton from "@/src/components/HeaderButton"
 import NetworkStatusBanner from "@/src/components/NetworkStatusBanner"
 import BookForm from "@/src/components/form/BookForm"
+import { useTheme } from "@/src/contexts/ThemeContext"
 import useBookForm from "@/src/hooks/useBookForm"
 import { useBook, useUpdateBook } from "@/src/hooks/useBooks"
 import type { Book as BookType } from "@/src/types/Book"
@@ -19,6 +20,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context"
 
 const EditBook = () => {
+  const { colors } = useTheme()
   const { id } = useLocalSearchParams<{ id: string }>()
   const router = useRouter()
 
@@ -75,10 +77,12 @@ const EditBook = () => {
     })
   }
 
+  const styles = createStyles(colors)
+
   if (isLoading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#007AFF" />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     )
   }
@@ -110,7 +114,7 @@ const EditBook = () => {
             disabled={isSaving}
           >
             {isSaving ? (
-              <ActivityIndicator size="small" color="#fff" />
+              <ActivityIndicator size="small" color={colors.surface} />
             ) : (
               <Text style={styles.saveButtonText}>Enregistrer</Text>
             )}
@@ -123,67 +127,68 @@ const EditBook = () => {
   )
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  centerContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    padding: 16,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#000",
-  },
-  saveButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    backgroundColor: "#007AFF",
-    minWidth: 100,
-    alignItems: "center",
-  },
-  saveButtonDisabled: {
-    opacity: 0.6,
-  },
-  saveButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  errorText: {
-    fontSize: 18,
-    color: "#666",
-    marginBottom: 20,
-  },
-  button: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    backgroundColor: "#007AFF",
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-})
+const createStyles = (colors: any) =>
+  StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    keyboardView: {
+      flex: 1,
+    },
+    centerContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: colors.background,
+      padding: 16,
+    },
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    headerTitle: {
+      fontSize: 18,
+      fontWeight: "600",
+      color: colors.text,
+    },
+    saveButton: {
+      paddingVertical: 8,
+      paddingHorizontal: 16,
+      borderRadius: 8,
+      backgroundColor: colors.primary,
+      minWidth: 100,
+      alignItems: "center",
+    },
+    saveButtonDisabled: {
+      opacity: 0.6,
+    },
+    saveButtonText: {
+      color: colors.surface,
+      fontSize: 16,
+      fontWeight: "600",
+    },
+    errorText: {
+      fontSize: 18,
+      color: colors.textSecondary,
+      marginBottom: 20,
+    },
+    button: {
+      paddingVertical: 12,
+      paddingHorizontal: 24,
+      borderRadius: 8,
+      backgroundColor: colors.primary,
+    },
+    buttonText: {
+      color: colors.surface,
+      fontSize: 16,
+      fontWeight: "600",
+    },
+  })
 
 export default EditBook

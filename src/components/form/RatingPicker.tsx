@@ -1,3 +1,4 @@
+import { useTheme } from "@/src/contexts/ThemeContext"
 import { FontAwesome } from "@expo/vector-icons"
 import { useState } from "react"
 import { GestureResponderEvent, LayoutChangeEvent, Pressable, StyleSheet, Text, View } from "react-native"
@@ -14,9 +15,13 @@ const RatingPicker = ({
   value,
   onChange,
   size = 36,
-  color = "#FFD700",
+  color,
   disabled = false,
 }: RatingPickerProps) => {
+  const { colors } = useTheme()
+  const starColor = color || colors.accent
+  const styles = createStyles(colors)
+
   const [hoveredRating, setHoveredRating] = useState<number | null>(null)
   const [containerLayout, setContainerLayout] = useState<{ x: number; width: number } | null>(null)
   const [isTouching, setIsTouching] = useState(false)
@@ -92,7 +97,7 @@ const RatingPicker = ({
 
     return (
       <View key={index} style={styles.starIcon}>
-        <FontAwesome name={iconName} size={size} color={color} />
+        <FontAwesome name={iconName} size={size} color={starColor} />
       </View>
     )
   }
@@ -124,44 +129,45 @@ const RatingPicker = ({
   )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    gap: 12,
-    width: "100%",
-  },
-  starsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-    width: "100%",
-    minHeight: 56,
-  },
-  starIcon: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  ratingInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  ratingText: {
-    fontSize: 18,
-    color: "#000",
-    fontWeight: "600",
-  },
-  resetText: {
-    fontSize: 14,
-    color: "#007AFF",
-    fontWeight: "500",
-  },
-  hint: {
-    fontSize: 12,
-    color: "#999",
-    fontStyle: "italic",
-  },
-})
+const createStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      gap: 12,
+      width: "100%",
+    },
+    starsContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      paddingVertical: 12,
+      paddingHorizontal: 8,
+      width: "100%",
+      minHeight: 56,
+    },
+    starIcon: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    ratingInfo: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
+    },
+    ratingText: {
+      fontSize: 18,
+      color: colors.text,
+      fontWeight: "600",
+    },
+    resetText: {
+      fontSize: 14,
+      color: colors.primary,
+      fontWeight: "500",
+    },
+    hint: {
+      fontSize: 12,
+      color: colors.textTertiary,
+      fontStyle: "italic",
+    },
+  })
 
 export default RatingPicker

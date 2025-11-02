@@ -1,6 +1,7 @@
 import HeaderButton from "@/src/components/HeaderButton"
 import NetworkStatusBanner from "@/src/components/NetworkStatusBanner"
 import BookForm from "@/src/components/form/BookForm"
+import { useTheme } from "@/src/contexts/ThemeContext"
 import useBookForm from "@/src/hooks/useBookForm"
 import { useCreateBook } from "@/src/hooks/useBooks"
 import type { Book as BookType } from "@/src/types/Book"
@@ -18,10 +19,13 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context"
 
 const CreateBook = () => {
+  const { colors } = useTheme()
   const router = useRouter()
   const { mutate: createBook, isPending: isSaving } = useCreateBook()
 
   const { formData, updateFormData, errors, validate, reset } = useBookForm()
+
+  const styles = createStyles(colors)
 
   const handleSave = () => {
     if (!validate()) {
@@ -75,7 +79,7 @@ const CreateBook = () => {
             disabled={isSaving}
           >
             {isSaving ? (
-              <ActivityIndicator size="small" color="#fff" />
+              <ActivityIndicator size="small" color={colors.surface} />
             ) : (
               <Text style={styles.saveButtonText}>Créer</Text>
             )}
@@ -88,44 +92,45 @@ const CreateBook = () => {
   )
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#000",
-  },
-  saveButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    backgroundColor: "#007AFF",
-    minWidth: 100,
-    alignItems: "center",
-  },
-  saveButtonDisabled: {
-    opacity: 0.6,
-  },
-  saveButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-})
+const createStyles = (colors: any) =>
+  StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    keyboardView: {
+      flex: 1,
+    },
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    headerTitle: {
+      fontSize: 18,
+      fontWeight: "600",
+      color: colors.text,
+    },
+    saveButton: {
+      paddingVertical: 8,
+      paddingHorizontal: 16,
+      borderRadius: 8,
+      backgroundColor: colors.primary,
+      minWidth: 100,
+      alignItems: "center",
+    },
+    saveButtonDisabled: {
+      opacity: 0.6,
+    },
+    saveButtonText: {
+      color: colors.surface,
+      fontSize: 16,
+      fontWeight: "600",
+    },
+  })
 
 export default CreateBook

@@ -1,3 +1,4 @@
+import { useTheme } from "@/src/contexts/ThemeContext"
 import { Dimensions } from "react-native"
 import Svg, { Circle, Defs, G, Line, Path, RadialGradient, Stop, Text as SvgText } from "react-native-svg"
 
@@ -11,7 +12,9 @@ type AreaChartProps = {
   color?: string
 }
 
-const AreaChart = ({ data, labels, color = "#007AFF" }: AreaChartProps) => {
+const AreaChart = ({ data, labels, color: customColor }: AreaChartProps) => {
+  const { colors } = useTheme()
+  const color = customColor || colors.primary
   const maxValue = Math.max(...data, 1)
   const points = data.map((value, index) => {
     const x = 50 + (index * (CHART_WIDTH - 80)) / (data.length - 1)
@@ -36,7 +39,7 @@ const AreaChart = ({ data, labels, color = "#007AFF" }: AreaChartProps) => {
       <G>
         {[0, 0.5, 1].map((fraction, i) => {
           const y = 180 - fraction * 140
-          return <Line key={i} x1="40" y1={y} x2={CHART_WIDTH - 20} y2={y} stroke="#f0f0f0" strokeWidth="1" />
+          return <Line key={i} x1="40" y1={y} x2={CHART_WIDTH - 20} y2={y} stroke={colors.borderLight} strokeWidth="1" />
         })}
 
         <Path d={areaPath} fill="url(#areaGradient)" />
@@ -44,11 +47,11 @@ const AreaChart = ({ data, labels, color = "#007AFF" }: AreaChartProps) => {
 
         {points.map((point, index) => (
           <G key={index}>
-            <Circle cx={point.x} cy={point.y} r="6" fill="#fff" stroke={color} strokeWidth="3" />
-            <SvgText x={point.x} y={point.y - 15} fontSize="12" fontWeight="600" fill="#000" textAnchor="middle">
+            <Circle cx={point.x} cy={point.y} r="6" fill={colors.surface} stroke={color} strokeWidth="3" />
+            <SvgText x={point.x} y={point.y - 15} fontSize="12" fontWeight="600" fill={colors.text} textAnchor="middle">
               {point.value}
             </SvgText>
-            <SvgText x={point.x} y="220" fontSize="11" fill="#666" textAnchor="middle">
+            <SvgText x={point.x} y="220" fontSize="11" fill={colors.textSecondary} textAnchor="middle">
               {labels[index]}
             </SvgText>
           </G>

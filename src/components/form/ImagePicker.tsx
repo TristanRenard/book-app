@@ -1,3 +1,4 @@
+import { useTheme } from "@/src/contexts/ThemeContext"
 import api from "@/src/utils/api"
 import { Feather } from "@expo/vector-icons"
 import { Image } from "expo-image"
@@ -25,6 +26,9 @@ const ImagePickerComponent = ({
   onUploadStart,
   onUploadEnd,
 }: ImagePickerComponentProps) => {
+  const { colors } = useTheme()
+  const styles = createStyles(colors)
+
   const [isUploading, setIsUploading] = useState(false)
   const [previewUri, setPreviewUri] = useState<string | undefined>(currentImageUrl)
 
@@ -296,12 +300,12 @@ const ImagePickerComponent = ({
         <View style={styles.placeholder}>
           {isUploading ? (
             <>
-              <ActivityIndicator size="large" color="#007AFF" />
+              <ActivityIndicator size="large" color={colors.primary} />
               <Text style={styles.placeholderText}>Upload en cours...</Text>
             </>
           ) : (
             <>
-              <Feather name="image" size={48} color="#ccc" />
+              <Feather name="image" size={48} color={colors.borderLight} />
               <Text style={styles.placeholderText}>Ajouter une couverture</Text>
               <Text style={styles.placeholderHint}>
                 {Platform.OS === "web"
@@ -316,68 +320,69 @@ const ImagePickerComponent = ({
   )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    width: "100%",
-    aspectRatio: 5 / 8,
-    maxHeight: 400,
-    backgroundColor: "#f5f5f5",
-    borderRadius: 8,
-    overflow: "hidden",
-  },
-  imageContainer: {
-    width: "100%",
-    height: "100%",
-    position: "relative",
-  },
-  image: {
-    width: "100%",
-    height: "100%",
-  },
-  uploadingOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 12,
-  },
-  uploadingText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  editBadge: {
-    position: "absolute",
-    bottom: 12,
-    right: 12,
-    backgroundColor: "#007AFF",
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  placeholder: {
-    width: "100%",
-    height: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 8,
-  },
-  placeholderText: {
-    fontSize: 16,
-    color: "#666",
-    fontWeight: "600",
-  },
-  placeholderHint: {
-    fontSize: 14,
-    color: "#999",
-  },
-})
+const createStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      width: "100%",
+      aspectRatio: 5 / 8,
+      maxHeight: 400,
+      backgroundColor: colors.surfaceVariant,
+      borderRadius: 8,
+      overflow: "hidden",
+    },
+    imageContainer: {
+      width: "100%",
+      height: "100%",
+      position: "relative",
+    },
+    image: {
+      width: "100%",
+      height: "100%",
+    },
+    uploadingOverlay: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: "rgba(0, 0, 0, 0.6)",
+      justifyContent: "center",
+      alignItems: "center",
+      gap: 12,
+    },
+    uploadingText: {
+      color: colors.surface,
+      fontSize: 16,
+      fontWeight: "600",
+    },
+    editBadge: {
+      position: "absolute",
+      bottom: 12,
+      right: 12,
+      backgroundColor: colors.primary,
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      justifyContent: "center",
+      alignItems: "center",
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 5,
+    },
+    placeholder: {
+      width: "100%",
+      height: "100%",
+      justifyContent: "center",
+      alignItems: "center",
+      gap: 8,
+    },
+    placeholderText: {
+      fontSize: 16,
+      color: colors.textSecondary,
+      fontWeight: "600",
+    },
+    placeholderHint: {
+      fontSize: 14,
+      color: colors.textTertiary,
+    },
+  })
 
 export default ImagePickerComponent
